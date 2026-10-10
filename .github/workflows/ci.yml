@@ -37,7 +37,8 @@ jobs:
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
           bun run bindings
-          git diff --exit-code -- src/lib/ipc/bindings.ts
+          # checkout's temporary Git config is not retained by later container steps.
+          git -c safe.directory="$GITHUB_WORKSPACE" diff --exit-code -- src/lib/ipc/bindings.ts
       - name: Audit language dependencies
         run: |
           bun audit
