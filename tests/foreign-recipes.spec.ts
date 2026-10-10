@@ -220,27 +220,38 @@ test("mismatched lookup identity cannot enable scan and export marks it historic
   expect((await exported(page)).currentSnapshotMatches).toBe(false);
 });
 
-test("inventory changes hide recipe handoff and refresh requires a new lookup", async ({
+test("inventory changes retire the detail and reopening requires a new recipe lookup", async ({
   page,
 }) => {
   await page.clock.install();
   await fixtures(page);
   const section = await open(page);
   await section.getByRole("button", { name: "Look up AUR recipe", exact: true }).click();
+  expect((await exported(page)).currentSnapshotMatches).toBe(true);
   await section.getByRole("button", { name: "Inspect matching recipe" }).click();
   await page.route("**/api/query", async (route) => {
     if (route.request().postDataJSON().command !== "snapshot") return route.fallback();
     await route.fulfill({ json: { ...snapshot(), fingerprint: "changed" } });
   });
   await page.clock.fastForward(60_001);
-  await expect(section.getByRole("button", { name: "Inspect matching recipe" })).toBeDisabled();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
   await expect(page.getByLabel("Matching AUR recipe review")).toHaveCount(0);
-  expect((await exported(page)).currentSnapshotMatches).toBe(false);
-  await section.getByRole("button", { name: "Refresh lookup inventory" }).click();
+  await expect(page.getByRole("button", { name: "Export lookup evidence" })).toHaveCount(0);
+  await page.getByRole("button", { name: `View ${pkg.name}`, exact: true }).click();
+  await page.getByRole("tab", { name: "Origin & trust" }).click();
   await expect(
     section.getByRole("button", { name: "Look up AUR recipe", exact: true }),
   ).toBeVisible();
   await expect(section.getByRole("button", { name: "Export lookup evidence" })).toHaveCount(0);
+  await page.route("**/api/query", async (route) => {
+    const body = route.request().postDataJSON();
+    if (body.command !== "foreign_recipe") return route.fallback();
+    expect(body.fingerprint).toBe("changed");
+    await route.fulfill({ json: { ...lookup(), fingerprint: "changed" } });
+  });
+  await section.getByRole("button", { name: "Look up AUR recipe", exact: true }).click();
+  await expect(section.getByRole("button", { name: "Inspect matching recipe" })).toBeEnabled();
+  expect((await exported(page)).currentSnapshotMatches).toBe(true);
 });
 
 for (const theme of ["light", "dark"]) {

@@ -7,6 +7,8 @@ pkgdesc='Security-focused package dashboard for Arch Linux and Omarchy'
 arch=('x86_64')
 url='https://github.com/Pettersen3008/archhub'
 license=('GPL-3.0-only')
+# GCC C LTO objects used by ring are incompatible with Rust's LLD linker.
+options=('!lto')
 makedepends=('rust' 'bun>=1.4' 'pkgconf' 'gtk3' 'webkit2gtk-4.1' 'python' 'desktop-file-utils')
 source=("archhub-$pkgver.tar.gz::$url/releases/download/v$pkgver/archhub-$pkgver.tar.gz")
 sha256sums=('@SOURCE_SHA256@')
