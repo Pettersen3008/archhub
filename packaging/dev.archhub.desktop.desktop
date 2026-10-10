@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=ArchHub
+Comment=Inspect Arch packages, advisories and AUR build recipes
+Exec=archhub
+Icon=dev.archhub.desktop
+Terminal=false
+Categories=System;PackageManager;
+Keywords=Arch;pacman;AUR;Omarchy;security;packages;
+StartupWMClass=archhub-desktop

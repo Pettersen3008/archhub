@@ -1,0 +1,10 @@
+{
+  "ignorePatterns": [
+    "src/lib/ipc/bindings.ts",
+    "CHATGPT.md",
+    "WORKSTATION-PLAN.md",
+    "artifacts/**",
+    "src-tauri/gen/**"
+  ],
+  "sortTailwindcss": { "stylesheet": "src/styles/globals.css" }
+}

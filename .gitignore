@@ -1,0 +1,16 @@
+node_modules/
+dist/
+target/
+.DS_Store
+playwright-report/
+test-results/
+*.log
+artifacts/
+src-tauri/gen/
+.env
+.env.*
+!.env.example
+__pycache__/
+.venv/
+CHATGPT.md
+WORKSTATION-PLAN.md

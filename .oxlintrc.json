@@ -1,0 +1,5 @@
+{
+  "plugins": ["typescript", "react", "jsx-a11y"],
+  "categories": { "correctness": "error" },
+  "ignorePatterns": ["src/lib/ipc/bindings.ts", "src-tauri/gen/**"]
+}

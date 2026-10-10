@@ -1,0 +1,11 @@
+[package]
+name = "archhub-helper"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-only"
+[dependencies]
+archhub-core = { path = "../archhub-core" }
+serde_json = "1"
+nix = { version = "0.31", features = ["user"] }
+[lints]
+workspace = true
