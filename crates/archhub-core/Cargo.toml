@@ -12,7 +12,7 @@ thiserror = "2"
 tokio = { version = "1", features = ["full"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 axum = "0.8"
-sha2 = "0.10"
+sha2 = "0.11"
 specta = { version = "=2.0.0-rc.22", features = ["derive"] }
 specta-typescript = "0.0.9"
 quick-xml = "0.42"
