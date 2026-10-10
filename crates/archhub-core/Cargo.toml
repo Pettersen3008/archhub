@@ -17,7 +17,7 @@ specta = { version = "=2.0.0-rc.22", features = ["derive"] }
 specta-typescript = "0.0.9"
 quick-xml = "0.42"
 chrono = { version = "0.4", default-features = false, features = ["std"] }
-similar = "2.7"
+similar = "3.2"
 tempfile = "3.27"
 nix = { version = "0.31", features = ["signal", "process", "user"] }
 glob = "0.3.4"
