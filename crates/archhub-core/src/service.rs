@@ -388,7 +388,7 @@ impl Service {
             }
             Request::Package { id } => {
                 let index = self.inventory.read().await;
-                let pkg = index.packages.iter().find(|p| p.id == id).ok_or_else(|| {
+                let pkg = index.package_by_id(&id).ok_or_else(|| {
                     Error::Invalid(
                         "Package is no longer in the index. Refresh and try again.".into(),
                     )
@@ -407,8 +407,6 @@ impl Service {
                     ));
                 }
                 let index = self.inventory.read().await;
-                let packages: HashMap<_, _> =
-                    index.packages.iter().map(|p| (p.id.as_str(), p)).collect();
                 let mut items = Vec::new();
                 let mut missing_ids = Vec::new();
                 let mut seen = std::collections::HashSet::new();
@@ -416,8 +414,8 @@ impl Service {
                     if !seen.insert(id.clone()) {
                         continue;
                     }
-                    if let Some(package) = packages.get(id.as_str()) {
-                        items.push((*package).clone());
+                    if let Some(package) = index.package_by_id(&id) {
+                        items.push(package.clone());
                     } else {
                         missing_ids.push(id);
                     }
@@ -709,10 +707,15 @@ mod tests {
                 }))
                 .unwrap(),
             );
+            let mut provider = inventory.packages[0].clone();
+            provider.id = "extra/provider".into();
+            provider.name = "provider".into();
+            inventory.packages.push(provider);
         }
         let result = service
             .execute(Request::PackagesByIds {
                 ids: vec![
+                    "extra/provider".into(),
                     "core/fixture".into(),
                     "old/fixture".into(),
                     "core/fixture".into(),
@@ -720,7 +723,9 @@ mod tests {
             })
             .await
             .unwrap();
-        assert_eq!(result["items"].as_array().unwrap().len(), 1);
+        assert_eq!(result["items"].as_array().unwrap().len(), 2);
+        assert_eq!(result["items"][0]["id"], "extra/provider");
+        assert_eq!(result["items"][1]["id"], "core/fixture");
         assert_eq!(result["missingIds"], serde_json::json!(["old/fixture"]));
         assert_eq!(result["fingerprint"], "fixture");
         for ids in [

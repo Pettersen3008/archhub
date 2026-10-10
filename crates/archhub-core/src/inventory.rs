@@ -20,6 +20,21 @@ pub struct Inventory {
     pub(crate) config: pacmanconf::Config,
 }
 
+impl Inventory {
+    pub(crate) fn package_by_id(&self, id: &str) -> Option<&Package> {
+        // load() keeps one preferred candidate per name, sorted by name.
+        // Check the complete ID so an old repository bookmark cannot silently
+        // resolve to the same name in a different repository.
+        let (_, name) = id.rsplit_once('/')?;
+        let position = self
+            .packages
+            .binary_search_by(|pkg| pkg.name.as_str().cmp(name))
+            .ok()?;
+        let package = &self.packages[position];
+        (package.id == id).then_some(package)
+    }
+}
+
 fn package(pkg: &alpm::Package, repository: &str, local: Option<&alpm::Package>) -> Package {
     let signed = local.is_some_and(|p| p.validation().contains(PackageValidation::SIGNATURE));
     Package {
