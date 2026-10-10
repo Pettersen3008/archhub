@@ -36,7 +36,8 @@ def prepare(output):
     archive = run("git", "archive", "--format=tar", f"--prefix=archhub-{version}/", commit)
     # Also verify the actual exported tree, not just its archive filename.
     with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
-        if any(not member.name.startswith(f"archhub-{version}/") for member in tar):
+        prefix = f"archhub-{version}"
+        if any(member.name != prefix and not member.name.startswith(prefix + "/") for member in tar):
             raise SystemExit("Unexpected source archive path.")
     output.mkdir(parents=True, exist_ok=True)
     source = output / f"archhub-{version}.tar.gz"
