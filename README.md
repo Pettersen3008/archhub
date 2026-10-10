@@ -50,6 +50,8 @@ This creates `archhub` (desktop app, CLI, launcher and icon) and the optional
 checksum. Use a disposable Arch VM for installation/removal verification; see
 [build requirements and release gates](docs/RELEASE.md). The optional helper-only
 local build below remains available for the existing transaction test harness.
+See [installation and upgrades](docs/RELEASE.md#installation-and-upgrades) for
+installing only the application, opting into the helper and the planned AUR path.
 
 ## Workspace
 

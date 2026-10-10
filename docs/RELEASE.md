@@ -46,6 +46,45 @@ rebuild and updated packaging. AUR and alternate architectures are not yet
 published/supported. Standard Arch checks cannot establish compatibility with
 every derivative or every custom repository.
 
+## Installation and upgrades
+
+For the first public release, use standard pacman packages. Publish a reviewed
+source recipe in the AUR once the matching source archive and release checks are
+complete. Users can then build with `makepkg` or their existing AUR helper.
+The desktop app and privileged helper remain separate packages; installing the
+desktop app must not implicitly enable native removal.
+
+The current preview can be installed from a locally built package in a disposable
+VM. From the repository root, inspect and install only the application:
+
+```bash
+pacman -Qip artifacts/release/archhub-0.1.0-1-x86_64.pkg.tar.zst
+pacman -Qlp artifacts/release/archhub-0.1.0-1-x86_64.pkg.tar.zst
+sudo pacman -U artifacts/release/archhub-0.1.0-1-x86_64.pkg.tar.zst
+archhub
+```
+
+If native removal is wanted, separately inspect and install
+`artifacts/release/archhub-helper-0.1.0-1-x86_64.pkg.tar.zst` with `pacman -U`.
+Do not use `makepkg --install` for this split recipe: it can install the optional
+helper too. The GUI always runs as the regular user.
+
+ArchHub itself will upgrade through the same package mechanism. Before AUR
+publication, build the new tagged revision and install the exact new application
+package with `pacman -U`; upgrade an installed helper from the same release.
+Release maintainers must increment the application version for a source release
+and `pkgrel` for packaging-only revisions. Once an AUR recipe is published,
+include ArchHub in the normal full system/AUR update using the user's existing
+helper. On Omarchy, preserve `omarchy update` and its migration lifecycle.
+ArchHub does not download and execute its own replacement or bypass the system
+package database. Plain Arch users should keep the full system updated with
+`pacman -Syu`, rather than synchronizing databases for a partial upgrade.
+
+Public binary packages and checksums require maintainer signatures before the
+stable release. Until then, CI packages are unsigned build evidence. Do not
+advertise a GitHub download or AUR installation command until that release or
+listing actually exists.
+
 ## Release gates
 
 Before tagging a stable release:
