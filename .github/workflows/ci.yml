@@ -1,6 +1,7 @@
 name: Arch checks
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -23,7 +24,7 @@ jobs:
       PLAYWRIGHT_BROWSER: firefox
     steps:
       - name: Install build and check tools in the disposable container
-        run: pacman -Syu --noconfirm --needed git rust bun pkgconf gtk3 webkit2gtk-4.1 python zstd desktop-file-utils cargo-audit nss alsa-lib
+        run: pacman -Syu --noconfirm --needed git rust bun pkgconf gtk3 webkit2gtk-4.1 python zstd desktop-file-utils cargo-audit nss alsa-lib dbus-glib
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false

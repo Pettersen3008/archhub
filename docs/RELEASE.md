@@ -15,7 +15,7 @@ Arch build environment. On Omarchy, use `omarchy update` for that update.
 # After committing the source revision:
 bun run release:prepare
 cd artifacts/release
-makepkg --cleanbuild
+CARGO_BUILD_JOBS=2 makepkg --cleanbuild
 ```
 
 The preparation script exports committed source using `git archive`, verifies
@@ -31,6 +31,12 @@ archive is available. Preparation and building do not install packages.
 - `archhub`: `/usr/bin/archhub`, `/usr/bin/archhub-cli`, desktop launcher and icon.
 - `archhub-helper`: root-owned one-shot helper and polkit policy. Install this
   only when authenticated native removal is wanted.
+
+Two Cargo build jobs limit peak memory; increase this explicitly on a suitable
+build machine. If Rust/Bun are installed through user toolchains rather than
+pacman's package database, verify every listed build dependency yourself before
+using makepkg's `--nodeps` option for a local build. CI uses installed Arch packages
+and performs normal dependency checks.
 
 For a local rebuild, an absolute `CARGO_TARGET_DIR` can reuse a Cargo cache. Use
 a clean Arch chroot for release binaries. Do not run `makepkg` as root. Inspect

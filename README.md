@@ -42,7 +42,7 @@ Build standard pacman packages from a committed checkout as a regular user:
 ```bash
 bun run release:prepare
 cd artifacts/release
-makepkg --cleanbuild
+CARGO_BUILD_JOBS=2 makepkg --cleanbuild
 ```
 
 This creates `archhub` (desktop app, CLI, launcher and icon) and the optional
