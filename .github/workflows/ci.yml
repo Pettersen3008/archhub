@@ -22,12 +22,21 @@ jobs:
       CARGO_TERM_COLOR: always
       CARGO_BUILD_JOBS: 2
       PLAYWRIGHT_BROWSER: firefox
+    defaults:
+      run:
+        shell: runuser -u builder -- bash --noprofile --norc -e -o pipefail {0}
     steps:
       - name: Install build and check tools in the disposable container
+        shell: bash
         run: pacman -Syu --noconfirm --needed git rust bun pkgconf gtk3 webkit2gtk-4.1 python zstd desktop-file-utils cargo-audit nss alsa-lib dbus-glib
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+      - name: Create the unprivileged build account
+        shell: bash
+        run: |
+          useradd --create-home builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
       - name: Install locked dependencies
         run: bun install --frozen-lockfile
       - name: Check source and generated IPC contract
@@ -37,8 +46,7 @@ jobs:
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
           bun run bindings
-          # checkout's temporary Git config is not retained by later container steps.
-          git -c safe.directory="$GITHUB_WORKSPACE" diff --exit-code -- src/lib/ipc/bindings.ts
+          git diff --exit-code -- src/lib/ipc/bindings.ts
       - name: Audit language dependencies
         run: |
           bun audit
@@ -50,9 +58,9 @@ jobs:
           bun run test:release
       - name: Build standard Arch packages as an unprivileged user
         run: |
-          useradd --create-home builder
-          chown -R builder:builder "$GITHUB_WORKSPACE"
-          runuser -u builder -- bash -c 'cd "$GITHUB_WORKSPACE" && python3 scripts/prepare-release.py && cd artifacts/release && makepkg --cleanbuild --noconfirm'
+          python3 scripts/prepare-release.py
+          cd artifacts/release
+          makepkg --cleanbuild --noconfirm
       - name: Retain build evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
